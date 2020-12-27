@@ -2,6 +2,7 @@
 # upload data to some provider where somebody else can find it ;)
 PRIVATE_KEY_FILE="$HOME/.ssh/nicepipe"
 PUBLIC_KEY_FILE="$HOME/.ssh/nicepipe.pub"
+# ssh-keygen -t rsa -b 4096 -f ~/.ssh/nicepipe
 # ssh-keygen -p -N "" -m pem -f ~/.ssh/nicepipe
 NICE_KNOWN_HOSTS="$HOME/.nice_known_hosts"
 

@@ -98,6 +98,7 @@ main(int argc, char *argv[]) {
   }
 
   // run async task using main loop
+  g_debug("Entering main loop...\n");
   g_main_loop_run(gloop);
 
   g_object_unref(agent);
