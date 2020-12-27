@@ -76,7 +76,7 @@ execute_sync(gchar *cmd, gchar* stdin, gchar** stdout, gchar** stderr) {
   waitpid(pid, &exit_status, 0);
   g_spawn_close_pid(pid);
 
-  gsize max_size = 10240;
+  gsize max_size = 20480;
   gsize bytes_read;
 
   // read stdout
@@ -112,8 +112,8 @@ execute_sync(gchar *cmd, gchar* stdin, gchar** stdout, gchar** stderr) {
 
 void
 local_credentials_to_string(NiceAgent *agent, guint stream_id, guint component_id, gchar** out) {
-  gchar buf[1024];
-  gchar tmp[1024];
+  gchar buf[2048];
+  gchar tmp[2048];
   gchar *local_ufrag = NULL;
   gchar *local_password = NULL;
   gchar ipaddr[INET6_ADDRSTRLEN];
@@ -275,7 +275,7 @@ publish_local_credentials(NiceAgent* agent, guint stream_id) {
   gint retval;
 
   // publish local credentials
-  gchar publish_cmd[1024];
+  gchar publish_cmd[2048];
   g_snprintf(publish_cmd, sizeof(publish_cmd), "./niceexchange.sh 0 %s publish dummy", remote_hostname);
   if(is_caller)
     publish_cmd[18] = '1';
@@ -301,7 +301,7 @@ unpublish_local_credentials(NiceAgent* agent, guint stream_id) {
   guint retval;
 
   g_debug("lookup remote credentials done\n");
-  gchar unpublish_cmd[1024];
+  gchar unpublish_cmd[2048];
   g_snprintf(unpublish_cmd, sizeof(unpublish_cmd), "./niceexchange.sh 0 %s unpublish dummy", remote_hostname);
   if(is_caller)
     unpublish_cmd[18] = '1';
@@ -322,7 +322,7 @@ void
 lookup_remote_credentials(NiceAgent* agent, guint stream_id) {
   guint retval;
 
-  gchar lookup_cmd[1024];
+  gchar lookup_cmd[2048];
   g_snprintf(lookup_cmd, sizeof(lookup_cmd), "./niceexchange.sh 0 %s lookup dummy", remote_hostname);
   if(is_caller)
     lookup_cmd[18] = '1';

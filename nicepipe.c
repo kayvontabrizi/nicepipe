@@ -53,7 +53,7 @@ main(int argc, char *argv[]) {
   g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, log_stderr, NULL);
 
   setup_glib();
-  
+
   NiceAgent *agent;
   agent = setup_libnice();
   keepalive_timer = g_timer_new();
@@ -73,7 +73,7 @@ main(int argc, char *argv[]) {
   g_debug("Starting to gather candidates...\n");
   if (!nice_agent_gather_candidates(agent, nice_stream_id)) {
     g_critical("Failed to start candidate gathering\n");
-    
+
     g_main_loop_unref(gloop);
     g_object_unref(agent);
 
@@ -104,7 +104,7 @@ parse_argv(int argc, char *argv[]) {
   }
 
   if(remote_hostname == NULL) {
-    g_critical("No remote hostname given! (Please use -h)");
+    g_critical("No remote hostname given! (Please use -H)");
     exit(1);
   }
 

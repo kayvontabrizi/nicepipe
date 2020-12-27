@@ -6,8 +6,10 @@ shift
 MODE=$1
 shift
 
-DIRNAME="$HOME/Dropbox/"
+DIRNAME="$HOME/Desktop/NICEPIPE"
 FILENAME="$DIRNAME/.nice$ISCALLER.cre"
+
+mkdir -p $DIRNAME
 
 if [ "$MODE" = "publish" ]; then
   cat > $FILENAME

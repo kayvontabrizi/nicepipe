@@ -8,52 +8,53 @@ ARGV=$@
 
 # find out if caller or callee
 for i in `seq $#`; do
-	if [ "$1" = '-c' ]; then
-		shift
-		IS_CALLER=$1
-	fi
-	if [ "$#" -ne 0 ]; then
-		shift
-	fi
+    if [ "$1" = '-c' ]; then
+        shift
+        IS_CALLER=$1
+    fi
+    if [ "$#" -ne 0 ]; then
+        shift
+    fi
 done
 
 # setup mode (pipe or vpn)
 if [ "$MODE" = 'pipe' ]; then
-	MODE_ARG=stdio
+    MODE_ARG=stdio
 elif [ "$MODE" = 'vpn' ]; then
-	if [ "$IS_CALLER" = "1" ]; then
-		IP="10.0.1.2/24"
-	else
-		IP="10.0.1.1/24"
-	fi
-	MODE_ARG=tun:$IP,iff-up
-	echo "Creating new network interface with IP# ${IP}"
+    if [ "$IS_CALLER" = "1" ]; then
+        IP="10.0.1.2/24"
+    else
+        IP="10.0.1.1/24"
+    fi
+    MODE_ARG=tun:$IP,iff-up
+    echo "Creating new network interface with IP# ${IP}"
 else
-	echo 'First argument must be "pipe" or "vpn"!'
-	echo "E.g. $0 pipe $1"
-	exit 1
+    echo 'First argument must be "pipe" or "vpn"!'
+    echo "E.g. $0 pipe $1"
+    exit 1
 fi
 
-
-NICE_LOCAL_CRT=`tempfile -s .lc -p.n`
-NICE_REMOTE_CRT=`tempfile -s .rc -p.n`
+mkdir -p "${TMPDIR:-/tmp}$(basename $0)"
+NICE_LOCAL_CRT=$(mktemp "${TMPDIR:-/tmp}$(basename $0)/lc.XXXXXXXXX")
+NICE_REMOTE_CRT=$(mktemp "${TMPDIR:-/tmp}$(basename $0)/rc.XXXXXXXXX")
 
 SOCAT=`which socat`
 
-openssl req -new -key ~/.ssh/id_rsa -x509 -days 365 -out $NICE_LOCAL_CRT -subj '/'
+PRIVATE_KEY_FILE="$HOME/.ssh/nicepipe"
+openssl req -new -x509 -key $PRIVATE_KEY_FILE -days 365 -out $NICE_LOCAL_CRT -subj '/'
 
 if [ "$IS_CALLER" = "1" ]; then
-	PORT=1500
-	NICE_PIPE_AFTER="$SOCAT $MODE_ARG openssl-connect:localhost:$PORT,key=$HOME/.ssh/id_rsa,cert=$NICE_LOCAL_CRT,cafile=$NICE_REMOTE_CRT,connect-timeout=30"
-	#NICE_PIPE_AFTER="$SOCAT -x -v stdio tcp-connect:localhost:$PORT"
+    PORT=1500
+    NICE_PIPE_AFTER="$SOCAT $MODE_ARG openssl-connect:localhost:$PORT,key=$PRIVATE_KEY_FILE,cert=$NICE_LOCAL_CRT,cafile=$NICE_REMOTE_CRT,connect-timeout=30"
+    #NICE_PIPE_AFTER="$SOCAT -x -v stdio tcp-connect:localhost:$PORT"
 else
-	PORT=1501
-	NICE_PIPE_BEFORE="$SOCAT openssl-listen:$PORT,key=$HOME/.ssh/id_rsa,cert=$NICE_LOCAL_CRT,cafile=$NICE_REMOTE_CRT $MODE_ARG"
-	#NICE_PIPE_BEFORE="$SOCAT -x -v tcp-listen:$PORT stdio"
+    PORT=1501
+    NICE_PIPE_BEFORE="$SOCAT openssl-listen:$PORT,key=$PRIVATE_KEY_FILE,cert=$NICE_LOCAL_CRT,cafile=$NICE_REMOTE_CRT $MODE_ARG"
+    #NICE_PIPE_BEFORE="$SOCAT -x -v tcp-listen:$PORT stdio"
 fi
 
 NICE_LOCAL_CRT=$NICE_LOCAL_CRT \
 NICE_REMOTE_CRT=$NICE_REMOTE_CRT \
 NICE_PIPE_AFTER=$NICE_PIPE_AFTER \
 NICE_PIPE_BEFORE=$NICE_PIPE_BEFORE \
-./niceport_raw $ARGV -P $PORT
+./bin/niceport_raw $ARGV -P $PORT

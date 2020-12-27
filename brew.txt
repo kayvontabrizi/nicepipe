@@ -1,0 +1,6 @@
+brew install libnice
+brew install glib
+brew install socat
+brew link gnutls
+brew link nettle
+brew link libtasn1

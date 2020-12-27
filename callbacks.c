@@ -83,10 +83,10 @@ attach_stdin2send_callback_reliable(NiceAgent *agent, guint stream_id, guint com
 
 gboolean
 send_data(GIOChannel *source, GIOCondition cond, gpointer agent_ptr) {
-  static char buffer[10240];
+  static char buffer[20480];
   struct iovec io;
-  char crap[10240];
-  const gsize max_size = 10240;
+  char crap[20480];
+  const gsize max_size = 20480;
   gsize len;
 
   NiceAgent *agent = agent_ptr;

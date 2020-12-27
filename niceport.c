@@ -121,7 +121,7 @@ parse_argv(int argc, char *argv[]) {
   }
 
   if(remote_hostname == NULL) {
-    g_critical("No remote hostname given! (Please use -h)");
+    g_critical("No remote hostname given! (Please use -H)");
     exit(1);
   }
 
@@ -152,7 +152,7 @@ setup_server(NiceAgent* agent) {
     g_object_unref(agent);
     g_object_unref(server);
     g_main_loop_unref(gloop);
-   
+
    exit(1);
   }
 
