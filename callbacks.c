@@ -23,7 +23,7 @@ exchange_credentials(NiceAgent *agent, guint stream_id, gpointer data) {
 
   pipe_stdio_to_hook("NICE_PIPE_BEFORE", exit_if_child_exited);
 
-  g_debug("candidate gathering done\n");
+  g_debug("candidate exchange complete\n");
 }
 
 gboolean
@@ -37,7 +37,7 @@ new_selected_pair(
 void
 start_server(NiceAgent *agent, guint stream_id, guint component_id, guint state, gpointer server_ptr) {
   GSocketService* server = (GSocketService*) server_ptr;
-  g_debug("Server starts listening.\n");
+  g_debug("`start_server`\n");
 
   if(is_caller)
     g_socket_service_start(server);
@@ -52,7 +52,7 @@ start_server(NiceAgent *agent, guint stream_id, guint component_id, guint state,
 void
 start_server_reliable(NiceAgent *agent, guint stream_id, guint component_id, gpointer server_ptr) {
   GSocketService* server = (GSocketService*) server_ptr;
-  g_debug("Server starts listening.\n");
+  g_debug("`start_server`\n");
 
   if(is_caller)
     g_socket_service_start(server);

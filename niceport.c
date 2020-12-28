@@ -13,6 +13,9 @@
 #include "util.h"
 #include "nice.h"
 
+// the flow of this utility pretty much follows libnice's "simple example":
+// https://gitlab.com/libnice/libnice/blob/master/examples/simple-example.c
+
 guint forward_port = 1500;
 guint stun_port = 3478;
 gchar* stun_host = NULL;
@@ -74,16 +77,18 @@ main(int argc, char *argv[]) {
     GSocketService* server;
     server = setup_server(agent);
   
-    if(not_reliable)
-      g_signal_connect(G_OBJECT(agent), "component-state-changed",  G_CALLBACK(start_server), server);
-    else
-      g_signal_connect(G_OBJECT(agent), "reliable-transport-writable",  G_CALLBACK(start_server_reliable), server);
+    g_signal_connect(G_OBJECT(agent), "component-state-changed",  G_CALLBACK(start_server), server);
+    // if(not_reliable)
+    //   g_signal_connect(G_OBJECT(agent), "component-state-changed",  G_CALLBACK(start_server), server);
+    // else
+    //   g_signal_connect(G_OBJECT(agent), "reliable-transport-writable",  G_CALLBACK(start_server_reliable), server);
   }
   else {
-    if(not_reliable)
-      g_signal_connect(G_OBJECT(agent), "component-state-changed",  G_CALLBACK(start_server), NULL);
-    else
-      g_signal_connect(G_OBJECT(agent), "reliable-transport-writable",  G_CALLBACK(start_server_reliable), NULL);
+    g_signal_connect(G_OBJECT(agent), "component-state-changed",  G_CALLBACK(start_server), NULL);
+    // if(not_reliable)
+    //   g_signal_connect(G_OBJECT(agent), "component-state-changed",  G_CALLBACK(start_server), NULL);
+    // else
+    //   g_signal_connect(G_OBJECT(agent), "reliable-transport-writable",  G_CALLBACK(start_server_reliable), NULL);
   }
 
   nice_agent_attach_recv(agent, nice_stream_id, 1, g_main_loop_get_context(gloop), recv_data2fd, NULL);
@@ -143,7 +148,7 @@ setup_server(NiceAgent* agent) {
   GError* error = NULL;
   GSocketService* server = g_socket_service_new();
 
-  g_debug("Started listening on port %i.", forward_port);
+  g_debug("Socket listener add port %i.", forward_port);
   g_socket_listener_add_inet_port((GSocketListener*)server,
                                   forward_port,
                                   NULL,

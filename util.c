@@ -236,6 +236,8 @@ parse_candidate(char *scand, guint stream_id) {
   gchar **tokens = NULL;
   guint i;
 
+  // g_debug("Candidate string: '%s'", scand);
+
   tokens = g_strsplit(scand, ",", 5);
   for(i = 0; tokens && tokens[i]; i++);
   if (i != 5)
@@ -302,7 +304,7 @@ void
 unpublish_local_credentials(NiceAgent* agent, guint stream_id) {
   guint retval;
 
-  g_debug("lookup remote credentials done\n");
+  g_debug("lookup remote credentials done, unpublishing\n");
   gchar unpublish_cmd[2048];
   g_snprintf(unpublish_cmd, sizeof(unpublish_cmd), "./niceexchange.sh 0 %s unpublish dummy", remote_hostname);
   if(is_caller)
