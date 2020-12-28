@@ -26,6 +26,14 @@ exchange_credentials(NiceAgent *agent, guint stream_id, gpointer data) {
   g_debug("candidate gathering done\n");
 }
 
+gboolean
+new_selected_pair(
+  NiceAgent *agent, guint stream_id, guint component_id,
+  gchar *lfoundation, gchar *rfoundation, gpointer data
+) {
+  g_debug("SIGNAL: selected pair %s %s", lfoundation, rfoundation);
+}
+
 void
 start_server(NiceAgent *agent, guint stream_id, guint component_id, guint state, gpointer server_ptr) {
   GSocketService* server = (GSocketService*) server_ptr;

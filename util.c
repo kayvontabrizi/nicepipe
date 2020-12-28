@@ -224,6 +224,8 @@ parse_remote_data(NiceAgent *agent, guint stream_id, guint component_id, char *l
       g_slist_free_full(remote_candidates, (GDestroyNotify)&nice_candidate_free);
     exit(1);
   }
+
+  g_debug("remote credentials parsed!\n");
 }
 
 
@@ -343,6 +345,7 @@ lookup_remote_credentials(NiceAgent* agent, guint stream_id) {
     exit(1);
   }
   parse_remote_data(agent, stream_id, 1, stdout, strlen(stdout));
+  g_debug("parsed remote data\n");
   g_free(stdout);
   g_free(stderr);
 }
@@ -371,7 +374,8 @@ pipe_stdio_to_hook(const gchar* envvar_name, GSourceFunc callback) {
   gint stdio[2];
   GError* error = NULL;
 
-  g_debug("Executing '%s'\n", cmd);
+  // btw, stdin inheritance is probably what obfuscates kill signals
+  g_debug("Executing (child inherits stdin): '%s'\n", cmd);
   spawned = g_spawn_async_with_pipes(".", argv, env, G_SPAWN_CHILD_INHERITS_STDIN, NULL, NULL,
     &pid, NULL, NULL, NULL, &error);
 

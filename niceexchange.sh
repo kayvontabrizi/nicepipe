@@ -20,7 +20,7 @@ shift
 MODE=$1
 shift
 
-set +x
+set -x # -x is debug
 
 mkdir -p "${TMPDIR:-/tmp}$(basename $0)"
 

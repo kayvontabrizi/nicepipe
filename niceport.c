@@ -66,8 +66,9 @@ main(int argc, char *argv[]) {
   NiceAgent *agent;
   agent = setup_libnice();
 
-  // Connect to signals
+  // connect to signals
   g_signal_connect(G_OBJECT(agent), "candidate-gathering-done", G_CALLBACK(exchange_credentials), NULL);
+  g_signal_connect(G_OBJECT(agent), "new-selected-pair", G_CALLBACK(new_selected_pair), NULL);
 
   if(is_caller) {
     GSocketService* server;
@@ -142,6 +143,7 @@ setup_server(NiceAgent* agent) {
   GError* error = NULL;
   GSocketService* server = g_socket_service_new();
 
+  g_debug("Started listening on port %i.", forward_port);
   g_socket_listener_add_inet_port((GSocketListener*)server,
                                   forward_port,
                                   NULL,
@@ -187,10 +189,10 @@ setup_client(NiceAgent* agent) {
 
   GSocketConnection *conn;
   conn = g_socket_client_connect_to_host(client,
-    "localhost", forward_port, NULL, &error);
+    (gchar*)"localhost", forward_port, NULL, &error);
 
   if(error != NULL) {
-    g_critical("Error starting to connecting on service localhost:%i! (%s)",
+    g_critical("Error connecting on service localhost:%i! (%s)",
                 forward_port, error->message);
     g_error_free(error);
     g_object_unref(agent);

@@ -2,6 +2,10 @@
 #define __CALLBACKS_H__
 
 gboolean exchange_credentials(NiceAgent *agent, guint stream_id, gpointer data);
+gboolean new_selected_pair(
+    NiceAgent *agent, guint stream_id, guint component_id,
+    gchar *lfoundation, gchar *rfoundation, gpointer data
+);
 void attach_stdin2send_callback(NiceAgent *agent, guint stream_id, guint component_id, guint state);
 void attach_stdin2send_callback_reliable(NiceAgent *agent, guint stream_id, guint component_id, gpointer data);
 gboolean send_data(GIOChannel *source, GIOCondition cond, gpointer agent_ptr);
