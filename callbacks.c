@@ -14,6 +14,9 @@
 #include "callbacks.h"
 #include "global.h"
 
+static const gchar *state_name[] = {"disconnected", "gathering", "connecting",
+                                    "connected", "ready", "failed"};
+
 gboolean
 exchange_credentials(NiceAgent *agent, guint stream_id, gpointer data) {
   g_debug("exchange_credentials(): candidate gathering done\n");
@@ -38,15 +41,41 @@ void
 start_server(NiceAgent *agent, guint stream_id, guint component_id, guint state, gpointer server_ptr) {
   GSocketService* server = (GSocketService*) server_ptr;
   g_debug("`start_server`\n");
+g_debug("SIGNAL: state changed %d %d %s[%d]\n", stream_id, component_id, state_name[state], state);
 
-  if(is_caller)
-    g_socket_service_start(server);
-  else
-    setup_client(agent);
+  if (state == NICE_COMPONENT_STATE_CONNECTED) {
+    // NiceCandidate *local, *remote;
 
-  pipe_stdio_to_hook("NICE_PIPE_AFTER", exit_if_child_exited);
+    // // Get current selected candidate pair and print IP address used
+    // if (nice_agent_get_selected_pair (agent, _stream_id, component_id,
+    //             &local, &remote)) {
+    //   gchar ipaddr[INET6_ADDRSTRLEN];
 
-  g_message("Connection to %s established.\n", remote_hostname);
+    //   nice_address_to_string(&local->addr, ipaddr);
+    //   printf("\nNegotiation complete: ([%s]:%d,",
+    //       ipaddr, nice_address_get_port(&local->addr));
+    //   nice_address_to_string(&remote->addr, ipaddr);
+    //   printf(" [%s]:%d)\n", ipaddr, nice_address_get_port(&remote->addr));
+    // }
+
+    // // Listen to stdin and send data written to it
+    // printf("\nSend lines to remote (Ctrl-D to quit):\n");
+    // g_io_add_watch(io_stdin, G_IO_IN, stdin_send_data_cb, agent);
+    // printf("> ");
+    // fflush (stdout);
+    if(is_caller)
+      g_socket_service_start(server);
+    else
+      setup_client(agent);
+
+    pipe_stdio_to_hook("NICE_PIPE_AFTER", exit_if_child_exited);
+
+    g_message("Connection to %s established.\n", remote_hostname);
+  // } else if (state == NICE_COMPONENT_STATE_GATHERING) {
+  // } else if (state == NICE_COMPONENT_STATE_CONNECTING) {
+  } else if (state == NICE_COMPONENT_STATE_FAILED) {
+    g_main_loop_quit (gloop);
+  }
 }
 
 void

@@ -194,8 +194,7 @@ setup_client(NiceAgent* agent) {
 
   GSocketConnection *conn;
   conn = g_socket_client_connect_to_host(client,
-    (gchar*)"10.0.0.1", forward_port, NULL, &error);
-    // (gchar*)"localhost", 1000, NULL, &error); // apparently resolving localhost is hard
+    (gchar*)"127.0.0.1", forward_port, NULL, &error);
 
   if(error != NULL) {
     g_critical("Error connecting to localhost:%i! (%s)",
