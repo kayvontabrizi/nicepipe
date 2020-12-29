@@ -132,6 +132,7 @@ send_data(GIOChannel *source, GIOCondition cond, gpointer agent_ptr) {
 
   gint res;
   do {
+    // THIS STUFF IS PROBABLY NOW WRONG
     io.iov_base = buffer;
     io.iov_len = max_size;
     memset(&msgh, 0, sizeof(msgh));
@@ -142,7 +143,7 @@ send_data(GIOChannel *source, GIOCondition cond, gpointer agent_ptr) {
 
     int sock = g_io_channel_unix_get_fd(source);
     
-    res = recvmsg(sock, &msgh, MSG_DONTWAIT);
+    res = recvmsg(sock, &msgh, MSG_DONTWAIT); // this is upset!
     if(res > -1) {
       if(res == 0) {
         // probably FLUSHED
