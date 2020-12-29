@@ -74,6 +74,9 @@ static gboolean stdin_remote_info_cb (GIOChannel *source, GIOCondition cond,
 static gboolean stdin_send_data_cb (GIOChannel *source, GIOCondition cond,
     gpointer data);
 
+void retrieve_remote_data(NiceAgent* agent, guint stream_id);
+gint execute_sync(gchar *cmd, gchar** stdout, gchar** stderr);
+
 int
 main(int argc, char *argv[])
 {
@@ -173,12 +176,101 @@ cb_candidate_gathering_done(NiceAgent *agent, guint _stream_id,
   print_local_data(agent, _stream_id, 1);
   printf("\n");
 
+  // // Listen on stdin for the remote candidate list
+  // printf("Enter remote data (single line, no wrapping):\n");
+  // g_io_add_watch(io_stdin, G_IO_IN, stdin_remote_info_cb, agent);
+  // printf("> ");
+  // fflush (stdout);
+
   // Listen on stdin for the remote candidate list
-  printf("Enter remote data (single line, no wrapping):\n");
-  g_io_add_watch(io_stdin, G_IO_IN, stdin_remote_info_cb, agent);
-  printf("> ");
-  fflush (stdout);
+  printf("Retrieving remote data via command line argument:\n");
+  retrieve_remote_data(agent, _stream_id);
+  fflush(stdout);
 }
+
+
+void
+retrieve_remote_data(NiceAgent* agent, guint stream_id) {
+  guint retval;
+
+  gchar cmd_in[2048];
+  g_snprintf(
+    cmd_in, sizeof(cmd_in), "./test_script 0 lookup"
+  );
+
+  gchar *stdout;
+  gchar *stderr;
+  retval = execute_sync(cmd_in, &stdout, &stderr);
+  g_debug("command executed!\n");
+  if(retval != 0) {
+    g_critical("lookup returned a non-zero return value (%i)!", retval);
+    if(stderr != NULL) g_critical("This was written to stderr:\n%s", stderr);
+
+    g_free(stdout);
+    g_free(stderr);
+
+    g_main_loop_unref(gloop);
+    g_object_unref(agent);
+
+    exit(1);
+  }
+
+  parse_remote_data(agent, stream_id, 1, stdout);
+  g_debug("parsed remote data\n");
+
+  g_free(stdout);
+  g_free(stderr);
+}
+
+
+gint
+execute_sync(gchar *cmd, gchar** stdout, gchar** stderr) {
+  GPid pid;
+  gboolean cmd_success;
+  gint exit_status;
+  gint stdio[3];
+
+  // run sync command
+  g_debug("Executing '%s'\n", cmd);
+  cmd_success = g_spawn_command_line_sync(
+    cmd, stdout, stderr, &exit_status, NULL
+    // cmd, &stdio[0], &stdio[1], &exit_status, NULL
+  );
+  g_assert(cmd_success);
+
+  // gsize max_size = 20480;
+  // gsize bytes_read;
+
+  // // read stdout
+  // if(stdout) {
+  //   gchar* buf = g_malloc(max_size*sizeof(gchar));
+
+  //   bytes_read = read(stdio[0], buf, sizeof(gchar)*max_size);
+  //   g_assert(bytes_read != max_size);
+  //   *stdout = g_malloc0(bytes_read);
+  //   memcpy(*stdout, buf, bytes_read);
+
+  //   g_free(buf);
+  // }
+
+  // // read stderr
+  // if(stderr) {
+  //   gchar* buf = g_malloc(max_size*sizeof(gchar));
+
+  //   bytes_read = read(stdio[1], buf, sizeof(gchar)*max_size);
+  //   g_assert(bytes_read != max_size);
+  //   *stderr = g_malloc0(bytes_read);
+  //   memcpy(*stderr, buf, bytes_read);
+
+  //   g_free(buf);
+  // }
+
+  // close(stdio[0]);
+  // close(stdio[1]);
+
+  return exit_status;
+}
+
 
 static gboolean
 stdin_remote_info_cb (GIOChannel *source, GIOCondition cond,

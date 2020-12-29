@@ -1,0 +1,35 @@
+#!/bin/sh
+
+ISCALLER=$1
+shift
+
+MODE=$1
+shift
+
+DIRNAME="$(realpath ./)"
+FILENAME="$DIRNAME/nice.$ISCALLER.cre"
+
+mkdir -p $DIRNAME
+
+if [ "$MODE" = "publish" ]; then
+  cat > $FILENAME
+fi
+
+if [ "$MODE" = "unpublish" ]; then
+  rm -f $FILENAME
+fi
+
+if [ "$MODE" = "lookup" ]; then
+  if [ $ISCALLER = "1" ]; then
+    FILENAME="$DIRNAME/nice.0.cre"
+  else
+    FILENAME="$DIRNAME/nice.1.cre"
+  fi
+
+  while [ ! -f "$FILENAME" ]; do
+    #echo "find $FILENAME"
+    #inotifywait -q -t 100 -e create . > /dev/null
+    sleep 1
+  done
+  cat $FILENAME
+fi
