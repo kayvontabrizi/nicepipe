@@ -25,6 +25,7 @@ if [ "$MODE" = "lookup" ]; then
   else
     FILENAME="$DIRNAME/nice.1.cre"
   fi
+  rm $FILENAME
 
   while [ ! -f "$FILENAME" ]; do
     #echo "find $FILENAME"

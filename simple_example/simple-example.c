@@ -201,7 +201,7 @@ retrieve_remote_data(NiceAgent* agent, guint stream_id) {
   gchar *stdout;
   gchar *stderr;
   retval = execute_sync(cmd_in, &stdout, &stderr);
-  g_debug("command executed!\n");
+  printf("Remote data retrieved!\n");
   if(retval != 0) {
     g_critical("lookup returned a non-zero return value (%i)!", retval);
     if(stderr != NULL) g_critical("This was written to stderr:\n%s", stderr);
